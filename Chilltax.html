@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chill Tax</title>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        :root {
+            --primary: #3aa6b9;
+            --secondary: #ffd700;
+            --dark: #1a1a2e;
+        }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8fafc;
+            line-height: 1.6;
+        }
+        header { 
+            background: var(--dark); 
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes heroAnimate {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        .hero-animate {
+            animation: heroAnimate 1s ease-out forwards;
+            opacity: 0;
+        }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.03);
+        }
+        
+        /* Navigation hover effects */
+        nav a:hover span {
+            width: 100% !important;
+        }
+        
+        /* Premium Services Box Styles */
+        .premium-box {
+            background: white; 
+            padding: 2rem; 
+            border-radius: 12px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        .premium-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            z-index: 2;
+        }
+        .premium-box button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .premium-box button:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        /* Pricing Box Styles */
+        .pricing-box {
+            border: 1px solid #eee; 
+            padding: 2.5rem; 
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .pricing-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            z-index: 2;
+        }
+        .pricing-box button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .pricing-box button:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 80%;
+            max-width: 500px;
+            animation: fadeIn 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, var(--primary) 200%);
+            transform: skewY(-5deg);
+            transform-origin: top right;
+            z-index: -1;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .modal-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        
+        /* Particles background */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 2rem !important;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .hero-animate h1 {
+                font-size: 2rem !important;
+            }
+            .premium-box, .pricing-box {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav style="display: flex; justify-content: space-between; align-items: center; 
+            padding: 1.5rem 5rem; 
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);">
+            <h1 style="font-size: 2rem; margin: 0; font-weight: 700; letter-spacing: -0.5px;">Chill Tax</h1>
+            <div>
+                <a href="#services" style="color: white; margin-left: 2rem; text-decoration: none; 
+                   font-weight: 500; font-size: 1.1rem; transition: all 0.3s; position: relative;">
+                   Services
+                   <span style="position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; 
+                          background: var(--secondary); transition: width 0.3s;"></span>
+                </a>
+                <a href="#contact" style="color: white; margin-left: 2rem; text-decoration: none;
+                   font-weight: 500; font-size: 1.1rem; transition: all 0.3s; position: relative;">
+                   Contact
+                   <span style="position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; 
+                          background: var(--secondary); transition: width 0.3s;"></span>
+                </a>
+            </div>
+        </nav>
+        <div style="padding: 6rem 0; 
+            background: linear-gradient(145deg, var(--dark) 0%, var(--primary) 120%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 350px;
+            padding: 3rem 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;">
+            <div class="particles" id="particles"></div>
+            
+            <h1 class="hero-animate" style="font-size: 3rem; margin-bottom: 1rem; line-height: 1.2; animation-delay: 0.2s; position: relative; z-index: 1;">Tax ka Stress? Chill Karo!</h1>
+            <p class="hero-animate" style="font-size: 1.5rem; color: var(--secondary); margin-bottom: 2rem; animation-delay: 0.4s;">Your CA experts for Hassle-Free Tax Solutions</p>
+            <button class="floating hero-animate" style="background: var(--secondary); color: var(--dark); padding: 12px 32px; font-size: 1.1rem; border: none; border-radius: 50px; font-weight: bold; animation-delay: 0.6s;" onclick="document.getElementById('contact').scrollIntoView()">Get Started</button>
+        </div>
+    </header>
+    
+    <section id="services" style="max-width: 800px; margin: 4rem auto; padding: 0 2rem;">
+        <h2 style="color: var(--primary); border-bottom: 2px solid var(--secondary); padding-bottom: 0.5rem;">Our Premium Services</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+            <div class="premium-box fade-in">
+                <div style="width: 50px; height: 50px; border-radius: 12px; 
+                         background: var(--primary); display: flex; align-items: center; 
+                         justify-content: center; margin-bottom: 1.5rem; color: white; font-size: 1.5rem;">
+                    📝
+                </div>
+                <h3 style="color: var(--primary);">📝 ITR Registration</h3>
+                <p>Complete Income Tax Return filing service</p>
+                <button onclick="openPlanModal('itr')">Know More</button>
+            </div>
+            <div class="premium-box fade-in">
+                <div style="width: 50px; height: 50px; border-radius: 12px; 
+                         background: var(--primary); display: flex; align-items: center; 
+                         justify-content: center; margin-bottom: 1.5rem; color: white; font-size: 1.5rem;">
+                    🏢
+                </div>
+                <h3 style="color: var(--primary);">🏢 GST Filing</h3>
+                <p>Monthly/Quarterly GST return preparation</p>
+                <button onclick="openPlanModal('gst')">Know More</button>
+            </div>
+            <div class="premium-box fade-in">
+                <div style="width: 50px; height: 50px; border-radius: 12px; 
+                         background: var(--primary); display: flex; align-items: center; 
+                         justify-content: center; margin-bottom: 1.5rem; color: white; font-size: 1.5rem;">
+                    💼
+                </div>
+                <h3 style="color: var(--primary);">💼 Company Registration</h3>
+                <p>Incorporation and compliance services</p>
+                <button onclick="openPlanModal('company')">Know More</button>
+            </div>
+        </div>
+    </section>
+    
+    <section style="background: white; padding: 4rem 0;">
+        <div style="max-width: 800px; margin: 0 auto; text-align: center; padding: 0 2rem;">
+            <h2 style="color: var(--primary); margin-bottom: 3rem;">Transparent Pricing</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 2rem;">
+                <div class="pricing-box">
+                    <div style="position: absolute;
+                         width: 100%;
+                         height: 5px;
+                         top: 0;
+                         left: 0;
+                         background: linear-gradient(90deg, var(--primary), var(--secondary));">
+                    </div>
+                    <h3>Starter Plan</h3>
+                    <p style="font-size: 2rem; color: var(--primary);">₹499 <span style="font-size: 1rem; text-decoration: line-through; color: #888;">₹999</span></p>
+                    <p>Basic ITR Filing</p>
+                    <p>For salaried individuals</p>
+                    <button onclick="openPlanModal('starter')">Choose Plan</button>
+                </div>
+                <div class="pricing-box">
+                    <div style="position: absolute;
+                         width: 100%;
+                         height: 5px;
+                         top: 0;
+                         left: 0;
+                         background: linear-gradient(90deg, var(--primary), var(--secondary));">
+                    </div>
+                    <h3>Premium Plan <span style="background: var(--secondary); color: var(--dark); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 8px;">Popular</span></h3>
+                    <p style="font-size: 2rem; color: var(--primary);">₹999 <span style="font-size: 1rem; text-decoration: line-through; color: #888;">₹2999</span></p>
+                    <p>All ITR Types</p>
+                    <p>GST Monthly Filing</p>
+                    <p>Company Compliance</p>
+                    <button onclick="openPlanModal('premium')">Choose Plan</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section style="max-width: 800px; margin: 3rem auto; padding: 2rem;">
+        <h2 style="color: var(--primary); text-align: center; margin-bottom: 2rem;">What Our Clients Say</h2>
+        <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+            <p style="font-style: italic;">"Chill Tax made my GST filing effortless!"</p>
+            <p style="text-align: right; font-weight: bold;">- Priti Gupta</p>
+        </div>
+    </section>
+    
+    <section style="background: #f9f9f9; padding: 4rem 0 6rem;">
+        <div style="max-width: 800px; margin: 0 auto; text-align: center; padding: 0 2rem;">
+            <h2 style="color: var(--primary); margin-bottom: 2rem; text-align: center;">Our Expert Team</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">Qualified professionals ensuring your taxes are handled with care</p>
+            <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                <div>
+                    <div style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; border: 3px solid var(--secondary); margin: 0 auto;">👨‍💼</div>
+                    <p style="margin: 1rem 0 0; font-weight: bold;">Tax Specialist</p>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.9em;">10+ Years Experience</p>
+                </div>
+                <div>
+                    <div style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; border: 3px solid var(--secondary); margin: 0 auto;">👩‍💼</div>
+                    <p style="margin: 1rem 0 0; font-weight: bold;">GST Expert</p>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.9em;">Certified Professional</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="contact" style="max-width: 800px; margin: 3rem auto; text-align: center; background: white; padding: 2rem; border-radius: 8px;">
+        <h2 style="color: var(--primary);">📞 Contact Us</h2>
+        <div style="margin-top: 1rem;">
+            <p style="font-size: 1.1rem; margin-bottom: 1rem;">Ready to make taxes chill? Reach out today!</p>
+            <form style="text-align: left; margin-top: 1.5rem;" onsubmit="handleFormSubmit(event)">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Your Name</label>
+                    <input type="text" id="userName" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Phone Number</label>
+                    <input type="tel" id="userPhone" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;" required>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Service Needed</label>
+                    <select id="serviceNeeded" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <option>ITR Filing</option>
+                        <option>GST Filing</option>
+                        <option>Company Registration</option>
+                    </select>
+                </div>
+                <p style="font-size: 0.9rem;">Or call us directly at: <a href="tel:+918448584489" style="color: var(--primary);">+91-8448584489</a></p>
+                <div style="margin-top: 1.5rem;">
+                    <button type="submit" class="hover-scale" style="background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: all 0.3s ease;">Get Free Consultation</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    
+    <footer style="background: var(--dark); color: white; padding: 3rem 1.5rem 1.5rem; margin-top: 3rem;">
+        <div style="max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+            <div>
+                <h3 style="color: var(--secondary);">Chill Tax</h3>
+                <p>Making tax easy since 2023</p>
+                <p>Founded by Suprit Kumar</p>
+            </div>
+            <div>
+                <h4>Services</h4>
+                <p>ITR Filing</p>
+                <p>GST Services</p>
+                <p>Company Registration</p>
+            </div>
+            <div>
+                <h4>Contact</h4>
+                <p>+91-8448584489</p>
+                <p>formalsuprit@gmail.com</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals for Plans -->
+    <div id="planModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePlanModal()">&times;</span>
+            <div id="modalContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles in the hero section
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `position: absolute;
+                    width: 2px;
+                    height: 2px;
+                    background: rgba(255, 215, 0, 0.6);
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation: float ${3 + Math.random() * 3}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 2}s;`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Modal functionality
+        function openPlanModal(planType) {
+            const modal = document.getElementById('planModal');
+            const modalContent = document.getElementById('modalContent');
+            let content = '';
+            
+            switch(planType) {
+                case 'itr':
+                    content = `<h2>ITR Registration Service</h2>
+                        <p>Complete Income Tax Return filing with expert guidance</p>
+                        <ul style="text-align: left;">
+                            <li>All ITR forms supported</li>
+                            <li>Expert review before filing</li>
+                            <li>Maximum refund optimization</li>
+                            <li>Free consultation included</li>
+                        </ul>
+                        <button onclick="contactForService('ITR Registration')" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Get Started</button>`;
+                    break;
+                case 'gst':
+                    content = `<h2>GST Filing Service</h2>
+                        <p>Monthly/Quarterly GST return preparation</p>
+                        <ul style="text-align: left;">
+                            <li>GSTR-1, GSTR-3B filing</li>
+                            <li>Reconciliation support</li>
+                            <li>Credit optimization</li>
+                            <li>Timely submissions</li>
+                        </ul>
+                        <button onclick="contactForService('GST Filing')" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Get Started</button>`;
+                    break;
+                case 'company':
+                    content = `<h2>Company Registration Service</h2>
+                        <p>Incorporation and compliance services</p>
+                        <ul style="text-align: left;">
+                            <li>Private Limited, LLP registration</li>
+                            <li>ROC compliance</li>
+                            <li>Annual filings</li>
+                            <li>Taxation setup</li>
+                        </ul>
+                        <button onclick="contactForService('Company Registration')" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Get Started</button>`;
+                    break;
+                case 'starter':
+                    content = `<h2>Starter Plan</h2>
+                        <p style="font-size: 1.5rem; color: var(--primary);">₹499 <span style="font-size: 0.9rem; text-decoration: line-through; color: #888;">₹999</span></p>
+                        <ul style="text-align: left;">
+                            <li>Basic ITR Filing</li>
+                            <li>For salaried individuals</li>
+                            <li>Dedicated CA support</li>
+                            <li>Form 16 processing</li>
+                        </ul>
+                        <button onclick="contactForService('Starter Plan')" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Select Plan</button>`;
+                    break;
+                case 'premium':
+                    content = `<h2>Premium Plan</h2>
+                        <p style="font-size: 1.5rem; color: var(--primary);">₹999 <span style="font-size: 0.9rem; text-decoration: line-through; color: #888;">₹2999</span></p>
+                        <ul style="text-align: left;">
+                            <li>All ITR Types</li>
+                            <li>GST Monthly Filing</li>
+                            <li>Company Compliance</li>
+                            <li>Priority customer support</li>
+                        </ul>
+                        <button onclick="contactForService('Premium Plan')" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Select Plan</button>`;
+                    break;
+            }
+            
+            modalContent.innerHTML = content;
+            modal.style.display = 'block';
+        }
+
+        function closePlanModal() {
+            document.getElementById('planModal').style.display = 'none';
+        }
+
+        function contactForService(service) {
+            const modal = document.getElementById('planModal');
+            modal.style.display = 'none';
+            document.getElementById('serviceNeeded').value = service;
+            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
+            const service = document.getElementById('serviceNeeded').value;
+            
+            alert(`Thank you ${name}! We'll contact you soon regarding ${service} at ${phone}. Keep chilling!`);
+            document.getElementById('userName').value = '';
+            document.getElementById('userPhone').value = '';
+        }
+
+        // Initialize page elements
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            // Animate hero elements on page load
+            const heroElements = document.querySelectorAll('.hero-animate');
+            heroElements.forEach(el => {
+                const delay = parseFloat(el.style.animationDelay || '0');
+                setTimeout(() => {
+                    el.classList.add('hero-animate');
+                }, delay * 1000);
+            });
+            
+            // Fade in elements with scroll
+            const fadeElements = document.querySelectorAll('.fade-in');
+            window.addEventListener('scroll', function() {
+                fadeElements.forEach(el => {
+                    const elTop = el.getBoundingClientRect().top;
+                    const windowBottom = window.innerHeight + window.scrollY;
+                    if (elTop < windowBottom) {
+                        el.classList.add('fade-in');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
